@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -45,10 +46,20 @@ to quickly create a Cobra application.`,
 			log.Print(m.Message().Payload, m.Text())
 			payload := m.Message().Payload
 
-			switch payload {
-			case "hello":
-				err = m.Send(fmt.Sprintf("Hello I'm Kbot %s!", appVersion))
+			if strings.HasPrefix(m.Text(), "echo") {
+				err = m.Send(fmt.Sprintf("You said: %s", strings.TrimPrefix(m.Text(), "echo")))
 
+			} else {
+				switch payload {
+				case "hello":
+					err = m.Send(fmt.Sprintf("Hello I'm Kbot %s!", appVersion))
+
+				case "help":
+					err = m.Send(fmt.Sprintf("Here are the available commands for Kbot %s:\n/start - Start the bot\n/start hello - Say hi to Kbot\necho - Repeat whatever you say\n/start help - Display this help message", appVersion))
+
+				default:
+					err = m.Send(fmt.Sprintf("Hello! Welcome to Kbot %s!", appVersion))
+				}
 			}
 
 			return err
