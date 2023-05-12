@@ -4,7 +4,10 @@ REGISTRY=mykhailovskyi
 VERSION=$(shell git describe --tags --abbrev=0)-$(shell git rev-parse --short HEAD)
 
 TARGETOS=linux #linux
-TARGETARCH=amd64 #amd64
+TARGETARCH ?= arm64
+
+windows: TARGETOS = windows
+macos: TARGETOS = darwin
 
 format:
 	gofmt -s -w ./
@@ -17,6 +20,16 @@ test:
 
 get:
 	go get
+
+linux: format get build
+
+# TARGETOS=windows
+windows: format get
+	$(MAKE) build
+
+# TARGETOS=darwin
+macos: format get
+	$(MAKE) build
 
 build: format get
 	CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -v -o kbot -ldflags "-X="github.com/mykhailovskyi/TG-BOT/cmd.appVersion=${VERSION}
