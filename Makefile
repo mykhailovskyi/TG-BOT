@@ -1,10 +1,14 @@
 # APP=$(basename $(shell git remote get-url origin))
-APP=app
-REGISTRY=mykhailovskyi
+APP=kbot
+# REGISTRY=mykhailovskyi
+REGISTRY=gcr.io/devops-prometheus-386204
 VERSION=$(shell git describe --tags --abbrev=0)-$(shell git rev-parse --short HEAD)
 windows: TARGETOS = windows
 macos: TARGETOS = darwin
 linux: TARGETOS = linux
+push-windows: TARGETOS = windows
+push-macos: TARGETOS = darwin
+push-linux: TARGETOS = linux
 # TARGETOS=linux #linux
 TARGETARCH ?= arm64
 
@@ -32,8 +36,13 @@ build: format get
 image:
 	docker build . -t ${REGISTRY}/${APP}:${VERSION}-${TARGETOS}-${TARGETARCH}
 
+# push:
+# docker push ${REGISTRY}/${APP}:${VERSION}-${TARGETOS}-${TARGETARCH}
+
 push:
-	docker push ${REGISTRY}/${APP}:${VERSION}-${TARGETARCH}
+	for i in $$(docker images | grep ${VERSION} | awk {' print $$1,$$2 '} | tr ' ' ':'); do docker push $${i}; done
+
 
 clean:
 	rm -rf kbot
+	docker rmi $$(docker images | grep ${VERSION} | tr -s ' ' | cut -d ' ' -f 3 | head -1) -f
