@@ -79,3 +79,5 @@ Lightweight tool for creating and running Kubernetes clusters in Docker containe
 |**Documentation**          |Comprehensive documentation available on the official website, covering installation, usage, troubleshooting, and more.           |Official documentation provides instructions for installation, basic usage, and configuration.|Documentation available on GitHub with guidance on installation, usage, and configuration           |
 |**Sustainability**          |Good sustainability due to its popularity, large user community, and active maintenance.            |Promising sustainability with a growing user base and active development.          |Sustainability may depend on adoption and community involvement as a newer tool.
 |**Podman**|Moderate difficulty |Challenging configuration |Relatively complex setup.
+
+![image](./minikube-echo.png)
