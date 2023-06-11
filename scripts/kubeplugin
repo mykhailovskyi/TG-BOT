@@ -1,0 +1,57 @@
+#!/bin/bash
+
+
+# Define command-line arguments
+# kubeplugin get
+RESOURCE_TYPE=$1
+NS=$2
+
+check_argument() {
+    local search_value="$1"  # Значення для пошуку
+    shift
+
+    for arg in "$@"; do
+        if [[ "$(echo "$arg" | tr '[:upper:]' '[:lower:]')" == "$(echo "$search_value" | tr '[:upper:]' '[:lower:]')" ]]; then
+            return 0  # Повертаємо успіх, аргумент знайдено
+        fi
+    done
+
+    return 1  # Повертаємо невдачу, аргумент не знайдено
+}
+
+# Retrieve resource usage statistics from Kubernetes
+# kubectl $2 $RESOURCE_TYPE | tail -n $1 | while read line
+kubectl top $RESOURCE_TYPE -n $NS | tail -n +2 | while read line
+do
+  # Extract CPU and memory usage from the output
+  NAME=$(echo $line | awk '{print $1}')
+  CPU=$(echo $line | awk '{print $2}')
+  MEMORY=$(echo $line | awk '{print $3}')
+
+  str='';
+
+  if check_argument "resource" "$@"; then
+    str+=" ${RESOURCE_TYPE}"
+  fi
+
+  if check_argument "namespace" "$@"; then
+    str+=" ${NS}"
+  fi
+
+  if check_argument "name" "$@"; then
+    str+=" ${NAME}"
+  fi
+
+  if check_argument "cpu" "$@"; then
+    str+="  ${CPU}"
+  fi
+
+  if check_argument "memory" "$@"; then
+    str+="  ${MEMORY}"
+  fi
+
+  echo "$str"
+
+  # Output the statistics to the console
+  # "Resource, Namespace, Name, CPU, Memory"
+done
